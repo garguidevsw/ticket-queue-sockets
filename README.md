@@ -1,5 +1,4 @@
-# Socket Server Basico
+# Aplicación de Cola de Tickets
 
-Un servidor de Websockets usando Node, Express y Socket.io
+Aplicación de cola de tickets con NodeJS, Express, SocketIO, esta nos permite crear tickets, y atender tickets.
 
-Temas cubiertos en mi curso de Node de cero a experto

@@ -4,16 +4,46 @@ const ticketControl = new TicketControl();
 
 const socketController = (socket) => {
 
-    socket.on('disconnect', () => {
-        console.log('Cliente desconectado', socket.id );
+    socket.emit('last-ticket', ticketControl.last);
+    socket.emit('pending-tickets', ticketControl.tickets.length);
+    socket.emit('last4-tickets', ticketControl.last4);
+
+    socket.on('next-ticket', ( payload, callback ) => {
+        
+        const next = ticketControl.next();
+        callback(next);
+
+        socket.broadcast.emit('pending-tickets', ticketControl.tickets.length);
+
     });
 
-    socket.on('enviar-mensaje', ( payload, callback ) => {
+    socket.on('attend-ticket', ( {desk}, callback ) => {
         
-        const id = 123456789;
-        callback( id );
+        if(!desk){
+            return callback({
+                ok: false,
+                msg: 'El escritorio es obligatorio'
+            });
+        }
 
-        socket.broadcast.emit('enviar-mensaje', payload );
+        const ticket = ticketControl.attendTicket(desk);
+
+        socket.broadcast.emit('last4-tickets', ticketControl.last4);
+        socket.broadcast.emit('pending-tickets', ticketControl.tickets.length);
+        socket.emit('pending-tickets', ticketControl.tickets.length);
+        
+        if(!ticket){
+            return callback({
+                ok: false,
+                msg: 'No hay tickets pendientes'
+            });
+        }else{
+            
+            callback({
+                ok: true,
+                ticket
+            });
+        }
 
     });
 
